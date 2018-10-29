@@ -7,8 +7,9 @@ import os.path
 
 # Constants
 GKG_FILENAME_MATCH = ".gkg.csv.zip"
-ZIPS_DIR = "zips"
-UNZIPS_DIR = "unzips"
+ZIPS_DIR = "data/zips"
+UNZIPS_DIR = "data/unzips"
+FILELIST = "data/file-lists/gkg-filelist-oct20-2018.txt"
 
 # Logging
 logging.basicConfig(
@@ -25,7 +26,7 @@ def get_gkg_file_list():
 
     gkg_file_list = []
     all_file_list_len = 0
-    fh = open('file-lists/gkg-filelist-oct20-2018.txt', 'rt')  # r: read, t: text
+    fh = open(FILELIST, 'rt')  # r: read, t: text
 
     for line in fh.readlines():
         all_file_list_len += 1
