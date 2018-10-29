@@ -91,12 +91,11 @@ def create_gkgrow(conn, gkg):
     :param gkg:
     :return:
     """
- 
-    sql = ''' INSERT INTO gkg
+    sql = ''' INSERT or IGNORE INTO gkg
               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
     cur = conn.cursor()
     cur.execute(sql, gkg)
-    return cur.lastrowid
+    return cur.rowcount
 
 
 # Sample only
