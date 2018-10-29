@@ -1,8 +1,8 @@
 # read-gkg-list.py
-import logging
 import urllib.request
 import zipfile
 import os.path
+from gkglib.gkglogging import *
 
 
 # Constants
@@ -11,15 +11,6 @@ ZIPS_DIR = "data/zips"
 UNZIPS_DIR = "data/unzips"
 FILELIST = "data/file-lists/gkg-filelist-oct20-2018.txt"
 
-# Logging
-logging.basicConfig(
-    level=logging.DEBUG,  # minimum level capture in the file
-    format='[%(asctime)s] %(levelname)s: %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S %p',
-    handlers=[
-        logging.FileHandler("{0}/{1}.log".format(".", "log-gkg"), mode='w'),
-        logging.StreamHandler()]
-    )
 
 # Function Defs
 def get_gkg_file_list():
