@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# data
+db/gkgsqlite.db
+.vscode/
+data/test-csvs/
+data/unzips/
+data/zips/
+db/pythonsqlite.db
+gkglib/__pycache__/
+gkgpy-v/
+log-gkg.log
