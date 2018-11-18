@@ -8,8 +8,8 @@ from gkglib.gkglogging import *
 
 UNZIPS_DIR = "data/unzips"
 TEST_DIR = "data/test-csvs"
-#SOURCE_DIR = UNZIPS_DIR  # point to test or prod dir
-SOURCE_DIR = TEST_DIR  # point to test or prod dir
+SOURCE_DIR = UNZIPS_DIR  # point to test or prod dir
+#SOURCE_DIR = TEST_DIR  # point to test or prod dir
 
 # Diagnostic metrics
 diags = {
@@ -18,7 +18,8 @@ diags = {
     'gkg_entries_total' : 0,
     'files_processed' : 0,
     'sql_rows_created' : 0,
-    'fields_errors' : 0   
+    'fields_errors' : 0,
+    'inserts_ignored' : 0
 }
 
 
@@ -30,12 +31,25 @@ def make_fields(fname, line_num, gkg_line):
     else:
         return 0, fields_list
 
-def insert_gkg_item(conn, fields_list):
-    
-    with conn:
-        num_created = create_gkgrow(conn, tuple(fields_list))
+def insert_gkg_item(conn, fname, line_num, gkg_line):
 
-    return num_created
+    num_inserted = 0
+
+    fields_err, fields_list = make_fields(fname, line_num, gkg_line)
+
+    if (fields_err == 0):
+        with conn:
+            num_inserted = create_gkgrow(conn, tuple(fields_list)) # INSERY GKG 
+            
+        diags['sql_rows_created'] += num_inserted
+        print('.', end='', flush=True)
+
+        if num_inserted == 0:
+            diags['inserts_ignored'] += 1
+        
+    else:
+        diags['fields_errors'] += 1
+
 
 # Main
 def main():
@@ -67,20 +81,15 @@ def main():
             for line in fh.readlines():
                 gkg_entries_this += 1
                 diags['gkg_entries_total'] += 1
-                fields_err, fields_list = make_fields(csv_file, gkg_entries_this, line)
-                if (fields_err == 0):
-                    # row s/b 0 (error or duplicate) or 1 (new row added)
-                    row = insert_gkg_item(conn, fields_list)
-                    diags['sql_rows_created'] += row
-                else:
-                    diags['fields_errors'] += 1
+                insert_gkg_item(conn, csv_file, gkg_entries_this, line) # INSERT INTO SQLITE
+                
 
         except Exception as e:
             logging.error("Failed reading " + csv_file)
             logging.error(e)
             sys.exit()
 
-        logging.info("Found " + str(gkg_entries_this) + " in " + csv_file)
+        logging.info("\nFound " + str(gkg_entries_this) + " in " + csv_file)
 
         if gkg_entries_this < diags['gkg_entries_lowest']:
             diags['gkg_entries_lowest'] = gkg_entries_this  
@@ -90,10 +99,10 @@ def main():
 
         diags['files_processed'] += 1
 
-    # Diagnostics
-    logging.info("RESULTS: ")
-    for key, value in diags.items():
-        logging.info(key + ": " + str(value))
+        # Diagnostics
+        logging.info("-------- STATUS -------")
+        for key, value in diags.items():
+            logging.info(key + ": " + str(value))
 
 if __name__ == '__main__':
     main()

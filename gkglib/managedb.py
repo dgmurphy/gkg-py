@@ -97,6 +97,15 @@ def create_gkgrow(conn, gkg):
     cur.execute(sql, gkg)
     return cur.rowcount
 
+#
+def select_locations(conn):
+    
+    cur = conn.cursor()
+    cur.execute(""" SELECT GKGRECORDID, Locations FROM gkg 
+                            WHERE Locations is not '' LIMIT 2 """)
+ 
+    rows = cur.fetchall()
+    return rows
 
 # Sample only
 def create_project(conn, project):
